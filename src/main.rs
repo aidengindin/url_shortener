@@ -46,7 +46,22 @@ fn success(short_url: &str) -> RawHtml<String> {
     ", short_url, short_url))
 }
 
+#[get("/<short_url>")]
+fn redirect(short_url: &str) -> Redirect {
+    let map = URL_MAP.lock().unwrap();
+    match map.get(short_url) {
+        Some(url) => Redirect::to(url.clone()),
+        None => Redirect::to("/not-saved")
+    }
+}
+
+// TODO: 404
+#[get("/not-saved")]
+fn not_saved() -> &'static str {
+    "That URL hasn't been saved."
+}
+
 #[launch]
 fn rocket() -> _ {
-    rocket::build().mount("/", routes![index, new, success])
+    rocket::build().mount("/", routes![index, new, success, redirect, not_saved])
 }
