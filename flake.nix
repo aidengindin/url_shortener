@@ -3,36 +3,26 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    rust-overlay.url = "github:oxalica/rust-overlay";
     flake-utils.url = "github:numtide/flake-utils";
+    naersk.url = "github:nix-community/naersk";
   };
 
-  outputs = { self, nixpkgs, rust-overlay, flake-utils, ... }:
+  outputs = { self, nixpkgs, flake-utils, naersk, ... }:
     flake-utils.lib.eachDefaultSystem (system:
       let
-        overlays = [ (import rust-overlay) ];
         pkgs = import nixpkgs {
-          inherit system overlays;
+          inherit system;
         };
-        rustVersion = pkgs.rust-bin.stable.latest.default;
-        rustPlatform = pkgs.makeRustPlatform {
-          cargo = rustVersion;
-          rustc = rustVersion;
-        };
+        naersk' = pkgs.callPackage naersk {};
       in
       {
-        defaultPackage = rustPlatform.buildRustPackage {
-          pname = "url_shortener";
-          version = "0.1.0";
+        defaultPackage = naersk'.buildPackage {
           src = ./.;
-          cargoLock.lockFile = ./Cargo.lock;
         };
         devShell = pkgs.mkShell {
-          buildInputs = with pkgs; [
-            rustVersion
-            rust-analyzer
-            pkg-config
-            openssl
+          nativeBuildInputs = with pkgs; [
+            rustc
+            cargo
           ];
         };
       }
