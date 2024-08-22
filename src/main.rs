@@ -1,8 +1,10 @@
+use rocket::fs::NamedFile;
+
 #[macro_use] extern crate rocket;
 
 #[get("/")]
-fn index() -> &'static str {
-    "Hello, world!"
+async fn index() -> Result<NamedFile, std::io::Error> {
+    NamedFile::open("index.html").await
 }
 
 #[launch]
