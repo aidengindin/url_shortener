@@ -21,15 +21,19 @@ async fn index() -> Result<NamedFile, std::io::Error> {
     NamedFile::open("index.html").await
 }
 
+fn generate_short_url() -> String {
+    rand::thread_rng()
+        .sample_iter(&Alphanumeric)
+        .take(8)
+        .map(char::from)
+        .collect()
+}
+
 #[post("/new", data = "<url>")]
 fn new(url: Form<Url<'_>>) -> Redirect {
 
     // generate a random shortened url
-    let short_url: String = rand::thread_rng()
-        .sample_iter(&Alphanumeric)
-        .take(8)
-        .map(char::from)
-        .collect();
+    let short_url = generate_short_url();
     let mut map = URL_MAP.lock().unwrap();
     map.insert(short_url.clone(), url.link.to_string());
 
