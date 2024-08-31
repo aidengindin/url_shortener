@@ -1,11 +1,7 @@
-use std::collections::HashMap;
-use std::sync::Mutex;
+use std::{collections::Hashmap, sync::Mutex};
 use once_cell::sync::Lazy;
 use rand::{distributions::Alphanumeric, Rng};
-use rocket::fs::NamedFile;
-use rocket::form::Form;
-use rocket::response::Redirect;
-use rocket::response::content::RawHtml;
+use rocket::{form::Form, fs::NamedFile, response::{content::RawHtml, Redirect}};
 
 #[macro_use] extern crate rocket;
 
